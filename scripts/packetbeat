@@ -1,0 +1,64 @@
+#!/bin/bash
+ES_PORT_REST=${ES_PORT_REST:-9200}
+ES_PORT_NATIVE=${ES_PORT_NATIVE:-9300}
+KIBANA_PORT=${ES_PORT:-8000}
+TZ=${TZ:-"Europe/Lisbon"}
+function rcont {
+	docker start $1
+}
+
+case $1 in
+        start)
+
+		echo "Starting Packetbeat stack..."
+
+        LOCALTIME=""
+        if [ -f /etc/localtime ];
+        then
+        	LOCALTIME="-v /etc/localtime:/etc/localtime"
+    	fi
+
+		if [[ `docker ps -a | grep -i "pbelastic" | grep -i "Exited" | wc -l` -eq 0 ]]; then
+			if [[ `docker ps | grep -i "pbelastic" | wc -l` -eq 0 ]]; then
+				docker run --name pbelastic -e TZ=$TZ $LOCALTIME -d -p 127.0.0.1:$ES_PORT_REST:$ES_PORT_REST -p 127.0.0.1:$ES_PORT_NATIVE:$ES_PORT_NATIVE dockerfile/elasticsearch >/dev/null
+			fi
+		else
+			rcont pbelastic
+		fi
+
+  		ES_IP=`docker inspect --format '{{ .NetworkSettings.IPAddress }}' pbelastic`
+
+		if [[ `docker ps -a | grep -i "pbkibana" | grep -i "Exited" | wc -l` -eq 0 ]]; then
+			if [[ `docker ps | grep -i "pbkibana" | wc -l` -eq 0 ]]; then
+				docker run -d --name pbkibana -e TZ=$TZ $LOCALTIME -e ES_HOST=$ES_IP -p 127.0.0.1:$KIBANA_PORT:$KIBANA_PORT packetbeat-kibana >/dev/null
+			fi
+		else
+			rcont pbkibana
+		fi
+		;;
+	stop)
+		docker stop pbelastic pbkibana
+		;;
+	pause)
+		docker pause pbelastic pbkibana;
+		;;
+	unpause)
+		docker unpause pbelastic pbkibana;
+		;;
+	restart)
+		docker restart pbelastic pbkibana
+		;;
+	rm)
+		$0 stop && docker rm pbelastic pbkibana
+		;;
+	log)
+		docker logs pbelastic
+		;;
+	logf)
+		docker logs -f pbelastic
+		;;
+	*)
+		echo "Usage: $0 {start|stop|restart|rm|log|logf}"
+		exit 2
+		;;
+esac

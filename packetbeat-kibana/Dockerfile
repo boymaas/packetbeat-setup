@@ -1,5 +1,5 @@
 FROM ubuntu:14.04
-MAINTAINER Tiago Pires <tandrepires@gmail.com>
+MAINTAINER Boy Maas <boy.maas@gmail.com>
 
 ENV ES_HOST localhost
 ENV HOME /opt/kibana-3.1.0-packetbeat

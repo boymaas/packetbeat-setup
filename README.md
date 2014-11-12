@@ -23,8 +23,8 @@ To stop, start, restart, rm, pause, unpause, log, logf:
 
 ## From docker hub ##
 
-    $ docker pull tpires/packetbeat-setup
-    $ docker run -it --rm -v /var/run/docker.sock:/docker.sock -v /usr/local/bin:/scripts tpires/packetbeat-setup
+    $ docker pull boymaas/packetbeat-setup
+    $ docker run -it --rm -v /var/run/docker.sock:/docker.sock -v /usr/local/bin:/scripts boymaas/packetbeat-setup
 
 The `-v /var/run/docker.sock:/docker.sock` makes it possible to build images and run containers of your host
 inside this docker image. The `-v /usr/local/bin:/scripts` copies packetbeat script that facilitates stop, start, restart, etc.
@@ -34,4 +34,5 @@ inside this docker image. The `-v /usr/local/bin:/scripts` copies packetbeat scr
 You still need to configure and execute packetbeat-agent. Read [this](https://github.com/packetbeat/packetbeat-docker).
 
 ## Thanks ##
+* @tpires for building this setup docker image to base there rest on
 * @tsg for building packetbeat-agent on docker and inspiring me to do this setup.

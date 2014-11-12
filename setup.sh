@@ -57,7 +57,7 @@ if [ "$ACTION" == "make" ] ; then
   "
 
   if [[ `docker -H unix:///docker.sock ps | grep -i "pbelastic" | wc -l` -eq 0 ]]; then
-    docker -H unix:///docker.sock run --name pbelastic -d -p 127.0.0.1:$ES_PORT_REST:$ES_PORT_REST -p 127.0.0.1:$ES_PORT_NATIVE:$ES_PORT_NATIVE dockerfile/elasticsearch >/dev/null
+    docker -H unix:///docker.sock run --name pbelastic -d -p $ES_PORT_REST:$ES_PORT_REST -p $ES_PORT_NATIVE:$ES_PORT_NATIVE dockerfile/elasticsearch >/dev/null
     wait_for_elastic
   fi
 
@@ -65,7 +65,7 @@ if [ "$ACTION" == "make" ] ; then
   curl -XPUT 'http://'$ES_IP':'$ES_PORT_REST'/_template/packetbeat' -d@$HOME/packetbeat.template.json >&- 2>&-
 
   if [[ `docker -H unix:///docker.sock ps | grep -i "pbkibana" | wc -l` -eq 0 ]]; then
-    docker -H unix:///docker.sock run -d --name pbkibana -e ES_HOST=$ES_IP -p 127.0.0.1:$KIBANA_PORT:$KIBANA_PORT packetbeat-kibana >/dev/null
+    docker -H unix:///docker.sock run -d --name pbkibana -e ES_HOST=$ES_IP -p $KIBANA_PORT:$KIBANA_PORT packetbeat-kibana >/dev/null
   fi
 
   clean_garbage
